@@ -1,63 +1,71 @@
 ##############################################################
 
 #Proportional test subsetting for classification cv
-PropSample <- function(ytemp,testprop=.25,nfold=10,minnum=3,output=F){
-  ytemp=factor(ytemp)
-  tbl=table(ytemp)
-  badclass=unique(c(which(names(tbl)==""),which(names(tbl)=="Unassigned"),which(tbl<minnum)))
-  names(badclass)=names(tbl)[badclass]
-  if(sum(is.na(ytemp))>0){
-    badind=which(is.na(ytemp))
+PropSample <- function(ytemp, testprop = .25, nfold = 10,
+                       minnum = 3, output = F){
+  ytemp <- factor(ytemp)
+  tbl <- table(ytemp)
+  badclass <- unique(c(which(names(tbl) == ""),
+                       which(names(tbl) == "Unassigned"),
+                       which(tbl < minnum)))
+  names(badclass) <- names(tbl)[badclass]
+  if(sum(is.na(ytemp)) > 0){
+    badind <- which(is.na(ytemp))
   }else{
-    badind=c()
+    badind <- c()
   }
-  if(length(badclass)>0){
-    if(output==T){
-      cat("PropSample Warning: Class(es)",paste(names(tbl)[badclass],collapse=",\n"),"has/have insufficient (<",minnum,") number of classes!\nOffending classes removed\n")
+  if(length(badclass) > 0){
+    if(output == T){
+      cat("PropSample Warning: Class(es)",
+          paste(names(tbl)[badclass], collapse = ",\n"),
+          "has/have insufficient (<",
+          minnum,
+          ") number of classes!\nOffending classes removed\n")
     }
-    badnames=names(badclass)
-    goodnames=names(tbl[-badclass])
+    badnames <- names(badclass)
+    goodnames <- names(tbl[-badclass])
     for(i in 1:length(badnames)){
-      badind=c(badind,which(ytemp==badnames[i]))
+      badind <- c(badind, which(ytemp == badnames[i]))
     }
-    goodind=c(1:length(ytemp))[-badind]
+    goodind <- c(1:length(ytemp))[-badind]
   }else{
-    goodind=c(1:length(ytemp))
-    goodnames=names(tbl)
+    goodind <- c(1:length(ytemp))
+    goodnames <- names(tbl)
   }
   
   #Checks to see if more trainind than nfold; if not, nfold lowered
-  if(floor(length(goodind)*(1-testprop))<=nfold){
-    nfold=floor(length(goodind)*(1-testprop))
+  if(floor(length(goodind) * (1 - testprop)) <= nfold){
+    nfold <- floor(length(goodind) * (1 - testprop))
   }
   #List holding test set indices and matrix for folds
-  cvntest=list(NULL,matrix(0,nrow=nfold,ncol=max(1,ceiling(length(goodind)/nfold))))
-  if(length(goodind)>0){
-    matind=1
+  cvntest <- list(NULL,
+                  matrix(0, nrow = nfold,
+                         ncol = max(1, ceiling(length(goodind) / nfold))))
+  if(length(goodind) > 0){
+    matind <- 1
     ##Check ortho and soymo
     for(i in 1:length(goodnames)){
       #Collect indices of relevant label
-      tind=which(ytemp==goodnames[i])
+      tind <- which(ytemp == goodnames[i])
       #Randomize order of labels
-      tind=tind[sample(1:length(tind),length(tind))]
+      tind <- tind[sample(1:length(tind), length(tind))]
       
-      lasttestind=max(floor(length(tind)*testprop),1)
-      testind=tind[1:lasttestind]
-      trainind=tind[(lasttestind+1):length(tind)]
-      cvntest[[1]]=c(cvntest[[1]],testind)
-      cvntest[[2]][matind:(matind-1+length(trainind))]=trainind
-      matind=matind+length(trainind)
-      #     cat(matind,dim(cvntest[[2]]),"\n")
+      lasttestind <- max(floor(length(tind) * testprop), 1)
+      testind <- tind[1:lasttestind]
+      trainind <- tind[(lasttestind + 1):length(tind)]
+      cvntest[[1]] <- c(cvntest[[1]], testind)
+      cvntest[[2]][matind:(matind - 1 + length(trainind))] <- trainind
+      matind <- matind + length(trainind)
     }
   }
-  cvntest2=vector("list",nfold+2)
-  cvntest2[[1]]=cvntest[[1]]
+  cvntest2 <- vector("list", nfold + 2)
+  cvntest2[[1]] <- cvntest[[1]]
   for(i in 1:nrow(cvntest[[2]])){
-    cvntemp=cvntest[[2]][i,]
-    cvntest2[[i+1]]=cvntemp[cvntemp!=0]
+    cvntemp <- cvntest[[2]][i, ]
+    cvntest2[[i + 1]] <- cvntemp[cvntemp != 0]
   }
-  if(length(badind)>0){
-    cvntest2[[nfold+2]]=badind
+  if(length(badind) > 0){
+    cvntest2[[nfold + 2]] <- badind
   }
   #First entry in the list is the test set, the rest are folds
   cvntest2
