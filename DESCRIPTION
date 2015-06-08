@@ -1,0 +1,9 @@
+Package: troyr
+Title: Troy's frequently used machine learning functions
+Version: 0.1
+Authors@R: person("Troy", "Hernandez", email = "troy.hernandez.phd@gmail.com",
+                  role = c("aut", "cre"))
+Description: This is meant to be a place for me to store all of my boring, but frequently used machine learning functions.
+Depends: R (>= 3.1.0)
+License: GPL-3
+LazyData: true
