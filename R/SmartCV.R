@@ -1,6 +1,7 @@
 ##############################################################
-
 #Proportional test subsetting for classification cv
+
+#' @export
 PropSample <- function(ytemp, testprop = .25, nfold = 10,
                        minnum = 3, output = F) {
   ytemp <- factor(ytemp)
@@ -74,6 +75,8 @@ PropSample <- function(ytemp, testprop = .25, nfold = 10,
 ############################################################
 # Transforms testing data with same transformations
 # (boxcox, then scaling) as training data
+
+#' @export
 TrainTestTrans <- function(Train, Test, bc = T, scl = T,
                            BCInstances = 8, output = F) {
   
