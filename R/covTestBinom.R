@@ -1,9 +1,21 @@
 require("glmnet")
 
-covTestBinom <- function (x, y, weights, maxp = "num.nonzero"){
+#' @export
+covTestBinom <- function (x, y, weights, maxp = "num.nonzero",
+                          prop.sample = F, nfolds = 10){
   # First build the model
+  
+  if(prop.sample == TRUE){
+    foldid <- rep(0, length(y))
+    foldid[which(y == 0)] <- rep(1:nfolds,
+                                 ceiling(length(y) / nfolds))[1:sum(y == 0)]
+    foldid[which(y == 1)] <- rep(1:nfolds,
+                                 ceiling(length(y) / nfolds))[1:sum(y == 1)]
+  }
+
   set.seed(1)
-  glm.mod <- cv.glmnet(x = x, y = y, family = "binomial", weights = weights)
+  glm.mod <- cv.glmnet(x = x, y = y, family = "binomial", weights = weights,
+                       foldid = foldid, nfolds = nfolds)
   
   glmobj = glm.mod$glmnet.fit
   n = nrow(x)
@@ -28,8 +40,8 @@ covTestBinom <- function (x, y, weights, maxp = "num.nonzero"){
   # maxp is limiting the number of things to check
   if(is.character(maxp)){
     which.lam.min <- which(glm.mod$lambda == glm.mod$lambda.min)
-    num.nonzero <- sum(glmobj$beta[, which.lam.min] != 0)
-    maxp = num.nonzero
+    # num.nonzero <- sum(glmobj$beta[, 1:which.lam.min] != 0)
+    maxp = which.lam.min #num.nonzero
   } else {
     maxp = min(c(length(jlist), which(lamlist == 0), nrow(x), ncol(x)), maxp)
   }
@@ -38,7 +50,7 @@ covTestBinom <- function (x, y, weights, maxp = "num.nonzero"){
   cov0 = cov = sig = rep(NA, maxp)
   yy = y - my
 
-  # Iterate through each variable entrance
+  # Iterate through each lambda step with a variable entrance
   for (j in 1:maxp) {
     cat("Calculating covTest ", j, " of ", maxp, "\n")
     lambda = lamlist[j + 1]
@@ -72,11 +84,13 @@ covTestBinom <- function (x, y, weights, maxp = "num.nonzero"){
   which.lam.min <- which(glm.mod$lambda == glm.mod$lambda.min)
   which.lam.1se <- which(glm.mod$lambda == glm.mod$lambda.1se)
 
-  var.pvalue <- data.frame(p.value = rep(1, dim(x)[2]),
+  var.pvalue <- data.frame(cov.stat = rep(NA, dim(x)[2]),
+                           p.value = rep(NA, dim(x)[2]),
                            beta.min = glmobj$beta[, which.lam.min],
                            beta.1se = glmobj$beta[, which.lam.1se])
   for(i in 1:length(jlist)){
-    for(j in 1:length(jlist[i])){
+    for(j in 1:length(jlist[i][[1]])){
+      var.pvalue[jlist[i][[1]][j], "cov.stat"] <- results[i, 1]
       var.pvalue[jlist[i][[1]][j], "p.value"] <- results[i, 2]
     }
   }

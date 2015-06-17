@@ -2,16 +2,16 @@
 #Proportional test subsetting for classification cv
 
 #' @export
-PropSample <- function(ytemp, testprop = .25, nfold = 10,
+PropSample <- function(y, testprop = .25, nfold = 10,
                        minnum = 3, output = F) {
-  ytemp <- factor(ytemp)
-  tbl <- table(ytemp)
+  y <- factor(y)
+  tbl <- table(y)
   badclass <- unique(c(which(names(tbl) == ""),
                        which(names(tbl) == "Unassigned"),
                        which(tbl < minnum)))
   names(badclass) <- names(tbl)[badclass]
-  if (sum(is.na(ytemp)) > 0) {
-    badind <- which(is.na(ytemp))
+  if (sum(is.na(y)) > 0) {
+    badind <- which(is.na(y))
   } else {
     badind <- c()
   }
@@ -26,11 +26,11 @@ PropSample <- function(ytemp, testprop = .25, nfold = 10,
     badnames <- names(badclass)
     goodnames <- names(tbl[-badclass])
     for (i in 1:length(badnames)) {
-      badind <- c(badind, which(ytemp == badnames[i]))
+      badind <- c(badind, which(y == badnames[i]))
     }
-    goodind <- c(1:length(ytemp))[-badind]
+    goodind <- c(1:length(y))[-badind]
   } else {
-    goodind <- c(1:length(ytemp))
+    goodind <- c(1:length(y))
     goodnames <- names(tbl)
   }
   
@@ -47,7 +47,7 @@ PropSample <- function(ytemp, testprop = .25, nfold = 10,
     
     for (i in 1:length(goodnames)) {
       #Collect indices of relevant label
-      tind <- which(ytemp == goodnames[i])
+      tind <- which(y == goodnames[i])
       #Randomize order of labels
       tind <- tind[sample(1:length(tind), length(tind))]
       
