@@ -118,6 +118,6 @@ covTestBinom <- function (x, y, weights, maxp = "num.nonzero",
     }
   }
 
-  list(var.list.pvalue = var.list.pvalue, var.list = var.list,
-       var.pvalue = var.pvalue, glm.mod = glm.mod)
+  list(var.list.pvalue = var.list.pvalue, var.pvalue = var.pvalue,
+       var.list = var.list, glm.mod = glm.mod)
 }
