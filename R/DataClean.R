@@ -1,7 +1,7 @@
 # DataClean.R
 # This function cleans data sets.  For now, this means removing bad columns.
 
-
+#' @export
 DataClean <- function(dat, clippy = FALSE, rm.uniform.cols = TRUE) {
 
   num.unq.val <- rep(0, ncol(dat))
