@@ -1,4 +1,3 @@
-require("glmnet")
 
 #' @export
 covTestBinom <- function (x, y, weights, maxp = "num.nonzero",
@@ -14,8 +13,9 @@ covTestBinom <- function (x, y, weights, maxp = "num.nonzero",
   }
 
   set.seed(1)
-  glm.mod <- cv.glmnet(x = x, y = y, family = "binomial", weights = weights,
-                       foldid = foldid, nfolds = nfolds)
+  glm.mod <- glmnet::cv.glmnet(x = x, y = y, family = "binomial",
+                               weights = weights, foldid = foldid,
+                               nfolds = nfolds)
   
   glmobj = glm.mod$glmnet.fit
   n = nrow(x)
@@ -54,7 +54,7 @@ covTestBinom <- function (x, y, weights, maxp = "num.nonzero",
   for (j in 1:maxp) {
     cat("Calculating covTest ", j, " of ", maxp, "\n")
     lambda = lamlist[j + 1]
-    yhat = as.vector(predict(glmobj, x, type = "link", s = lambda/n))
+    yhat = as.vector(glmnet::predict(glmobj, x, type = "link", s = lambda/n))
     cov[j] = sum(yy * yhat)
     
     if (j == 1) {
@@ -67,10 +67,10 @@ covTestBinom <- function (x, y, weights, maxp = "num.nonzero",
       #                              glmobj$beta[tt0,lambda.ind[j]] +
       #                              glmobj$a0[lambda.ind[j]]))
       #       yhat0 = as.vector(predict(glmobj, x, type = "link", s = lambda/n))
-      glmobj0 = glmnet(x[, tt0, drop = F], y, family = "binomial", 
-                       lambda = glmobj$lambda, weights = weights)
-      yhat0 = as.vector(predict(glmobj0, x[, tt0, drop = F],
-                                type = "link", s = lambda/n))
+      glmobj0 = glmnet::glmnet(x[, tt0, drop = F], y, family = "binomial",
+                               lambda = glmobj$lambda, weights = weights)
+      yhat0 = as.vector(glmnet::predict(glmobj0, x[, tt0, drop = F],
+                                        type = "link", s = lambda/n))
       cov0[j] = sum(yy * yhat0)
     }
   }

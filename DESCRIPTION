@@ -7,3 +7,4 @@ Description: This is meant to be a place for me to store all of my boring, but f
 Depends: R (>= 3.1.0)
 License: GPL-3
 LazyData: true
+Imports: glmnet
