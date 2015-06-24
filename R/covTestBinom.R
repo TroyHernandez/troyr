@@ -40,8 +40,8 @@ covTestBinom <- function (x, y, weights, maxp = "num.nonzero",
   # maxp is limiting the number of things to check
   if(is.character(maxp)){
     which.lam.min <- which(glm.mod$lambda == glm.mod$lambda.min)
-    # num.nonzero <- sum(glmobj$beta[, 1:which.lam.min] != 0)
-    maxp = which.lam.min #num.nonzero
+    maxp <- which(lambda.ind <= which.lam.min) # adjusted for lambda.ind subset
+    maxp <- ifelse(length(maxp) > 0, maxp[length(maxp)], 1) # must be nonempty
   } else {
     maxp = min(c(length(var.list), which(lamlist == 0), nrow(x), ncol(x)), maxp)
   }
