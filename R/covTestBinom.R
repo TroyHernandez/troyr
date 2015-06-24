@@ -54,7 +54,7 @@ covTestBinom <- function (x, y, weights, maxp = "num.nonzero",
   for (j in 1:maxp) {
     cat("Calculating covTest ", j, " of ", maxp, "\n")
     lambda = lamlist[j + 1]
-    yhat = as.vector(glmnet::predict(glmobj, x, type = "link", s = lambda/n))
+    yhat = as.vector(predict(glmobj, x, type = "link", s = lambda/n))
     cov[j] = sum(yy * yhat)
     
     if (j == 1) {
@@ -69,8 +69,8 @@ covTestBinom <- function (x, y, weights, maxp = "num.nonzero",
       #       yhat0 = as.vector(predict(glmobj, x, type = "link", s = lambda/n))
       glmobj0 = glmnet::glmnet(x[, tt0, drop = F], y, family = "binomial",
                                lambda = glmobj$lambda, weights = weights)
-      yhat0 = as.vector(glmnet::predict(glmobj0, x[, tt0, drop = F],
-                                        type = "link", s = lambda/n))
+      yhat0 = as.vector(predict(glmobj0, x[, tt0, drop = F],
+                                type = "link", s = lambda/n))
       cov0[j] = sum(yy * yhat0)
     }
   }
