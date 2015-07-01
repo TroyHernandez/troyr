@@ -1,9 +1,9 @@
 
 #' @export
 covTestBinom <- function (x, y, weights, maxp = "num.nonzero",
-                          prop.sample = F, nfolds = 10){
-  # First build the model
-  
+                          prop.sample = FALSE, nfolds = 10, parallel = FALSE,
+                          ncores = NULL){
+  # Determine foldids
   if(prop.sample == TRUE){
     foldid <- rep(0, length(y))
     foldid[which(y == 0)] <- rep(1:nfolds,
@@ -11,12 +11,24 @@ covTestBinom <- function (x, y, weights, maxp = "num.nonzero",
     foldid[which(y == 1)] <- rep(1:nfolds,
                                  ceiling(length(y) / nfolds))[1:sum(y == 1)]
   }
-
-  set.seed(1)
-  glm.mod <- glmnet::cv.glmnet(x = x, y = y, family = "binomial",
-                               weights = weights, foldid = foldid,
-                               nfolds = nfolds)
   
+  # Determine parallelism
+  if (parallel == TRUE) {
+    if (is.null(ncores)) {
+      ncores <- as.numeric(Sys.getenv('NUMBER_OF_PROCESSORS'))
+    }
+    doParallel::registerDoParallel(ncores)
+    set.seed(1)
+    glm.mod <- glmnet::cv.glmnet(x = x, y = y, family = "binomial",
+                                 weights = weights, foldid = foldid,
+                                 nfolds = nfolds, parallel = TRUE)
+  } else {
+    set.seed(1)
+    glm.mod <- glmnet::cv.glmnet(x = x, y = y, family = "binomial",
+                                 weights = weights, foldid = foldid,
+                                 nfolds = nfolds)
+  }
+
   glmobj = glm.mod$glmnet.fit
   n = nrow(x)
   p = ncol(x)
