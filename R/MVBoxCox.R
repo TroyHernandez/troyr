@@ -1,7 +1,6 @@
 #MVBoxCox.R
 
-############################################################
-##Optimal lambda values as $lambda
+#' @export
 MVBoxCox <- function(xmat, lamseq = seq(-2, 2, .05), NumInstances = 4,
                      Instance = 1, output = T) {
   lambda <- c(rep(0, ncol(xmat)))
